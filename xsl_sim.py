@@ -124,14 +124,14 @@ def bias_perm():
             x+='-learner','-maintainer','-constructor'
     return all
     
-def xsl_simulation(adult, learner, learning_episodes, trials, report_every, rule, context, noise):
+def xsl_simulation(adult, learner, learning_episodes, trials, report, rule, context, noise):
     data_accumulator = []
     for i in range(learning_episodes):
         utterance = produce_data(adult, context, noise)
         u = utterance[0]
         signal = utterance[1]
         multiple_meaning_learn(learner, u, signal, rule)
-        if (i % report_every == 0):
+        if (i % report == 0):
             data_accumulator.append(ca_monte(adult, learner, trials))
     return [learner,data_accumulator]
 
@@ -140,11 +140,11 @@ def xsl_pop(population, le, trials, report, rule, context, noise):
         a = random.choice(population)
         utterance = produce_data(a, context, noise)
         pop_learn(population, utterance, le, rule)
-        if (i % report_every == 0):
+        if (i % report == 0):
             data_accumulator.append(ca_monte_pop(population, trials))
     return [learner,data_accumulator]
 
-def xsl_gen(gen=100, le=100, mc=500, report=10, meanings=5, signals=5, filename='test.txt', fop='w', type='optimal', sim=None, restrict=None, context=0, noise=0.):
+def xsl_gen(gen=100, le=100, mc=500, report=10, meanings=5, signals=5, filename='test.txt', acquisition=False, type='optimal', restrict=None, context=1, noise=0.):
     biases = bias_perm()
     if restrict == 'learners':
         biases2 = [b for b in biases if '+learner' in b]
@@ -156,13 +156,13 @@ def xsl_gen(gen=100, le=100, mc=500, report=10, meanings=5, signals=5, filename=
         biases2 = [b for b in biases if '+constructor' in b]
         biases = biases2
     population = new_population(type, meanings, signals)
-    f = open(filename, fop)
+    f = open(filename, 'w')
     f.write("Learner?\tMaintainer?\tConstructor?\tBias")
     for i in range(gen):
         q = i+1
         f.write("\t%d" % q)
     f.write("\n")
-    if sim=='acquisition':
+    if acquisition:
         adult = new_agent('optimal', meanings, signals)
         learner = new_agent('random', meanings, signals)
         for b in biases:
