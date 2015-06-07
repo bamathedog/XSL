@@ -144,7 +144,7 @@ def xsl_pop(population, le, trials, report, rule, context, noise):
             data_accumulator.append(ca_monte_pop(population, trials))
     return [learner,data_accumulator]
 
-def xsl_gen(gen=100, le=100, mc=500, report=10, meanings=5, signals=5, filename='test.txt', acquisition=False, type='optimal', restrict=None, context=1, noise=0.):
+def xsl_gen(gen=100, le=100, mc=500, report=10, meanings=5, signals=5, filename='test.txt', acquisition=False, optimal=True, restrict=None, context=1, noise=0.):
     biases = bias_perm()
     if restrict == 'learners':
         biases2 = [b for b in biases if '+learner' in b]
@@ -155,6 +155,10 @@ def xsl_gen(gen=100, le=100, mc=500, report=10, meanings=5, signals=5, filename=
     elif restrict == 'constructors':
         biases2 = [b for b in biases if '+constructor' in b]
         biases = biases2
+    if optimal:
+        type = 'optimal'
+    else:
+        type = 'random'
     population = new_population(type, meanings, signals)
     f = open(filename, 'w')
     f.write("Learner?\tMaintainer?\tConstructor?\tBias")
